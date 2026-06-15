@@ -1,0 +1,6 @@
+requests==2.31.0
+PyYAML==6.0.1
+python-dotenv==1.0.0
+notion-client==2.2.1
+beautifulsoup4==4.12.3
+xmltodict==0.13.0

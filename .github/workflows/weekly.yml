@@ -1,0 +1,44 @@
+name: 주간 부동산 시세 리포트
+
+on:
+  schedule:
+    # 매주 월요일 오전 8시 KST (일요일 23:00 UTC)
+    - cron: '0 23 * * 0'
+  workflow_dispatch:  # 수동 실행 버튼
+
+permissions:
+  contents: write   # docs/index.html 자동 커밋에 필요
+
+jobs:
+  report:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 코드 체크아웃
+        uses: actions/checkout@v4
+
+      - name: Python 설정
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: 'pip'
+
+      - name: 패키지 설치
+        run: pip install -r requirements.txt
+
+      - name: 리포트 실행
+        env:
+          MOLIT_API_KEY:          ${{ secrets.MOLIT_API_KEY }}
+          NOTION_TOKEN:           ${{ secrets.NOTION_TOKEN }}
+          NOTION_PARENT_PAGE_ID:  ${{ secrets.NOTION_PARENT_PAGE_ID }}
+          NAVER_MAP_CLIENT_ID:    ${{ secrets.NAVER_MAP_CLIENT_ID }}
+          KAKAO_APP_KEY:          ${{ secrets.KAKAO_APP_KEY }}
+          KAKAO_REFRESH_TOKEN:    ${{ secrets.KAKAO_REFRESH_TOKEN }}
+        run: python src/main.py
+
+      - name: 지도 파일 GitHub Pages에 배포
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add docs/index.html
+          git diff --cached --quiet || git commit -m "docs: 주간 지도 업데이트 $(date +'%Y-%m-%d')"
+          git push

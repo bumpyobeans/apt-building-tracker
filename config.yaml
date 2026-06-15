@@ -1,0 +1,37 @@
+building:
+  name: "별내동 건물"
+  address: "경기도 남양주시 불암로 41-82"
+  lawd_cd: "41360"              # 남양주시 법정동코드 앞 5자리
+  building_type: "mixed"       # apartment / villa / officetel / detached / mixed(상가+주거)
+  land_area_m2: 330.58         # 대지면적 (100평 × 3.3058)
+
+  # 임대 현황
+  monthly_rent_man: 440        # 월세 합계 (만원) — 1층 상가 2개 × 220만원
+  shop_deposit_man: 5000       # 상가 보증금 합계 (만원)
+  jeonse_deposit_man: 45000    # 전세 보증금 합계 (만원) — 2층 2억5천 + 2억
+  loan_man: 15000              # 현재 대출 잔액 (만원)
+  owner_floor: 3               # 주인 거주 층 (매도 시 이사 필요)
+  # 세부 내역 (참고용)
+  # 1층 상가A: 월세 220만원 / 보증금 포함
+  # 1층 상가B: 월세 220만원 / 보증금 포함
+  # 2층 25평:  전세 2억5천만원
+  # 2층 20평:  전세 2억만원
+  # 3층:       주인 거주
+
+search:
+  area_tolerance_pct: 30        # 비교 대상 대지면적 허용 오차 ±%
+  months_back: 6                # 최근 N개월 실거래가 조회
+
+naver:
+  cortar_no: "4136010400"
+  real_estate_type: "DDDGG"
+
+candidates:                      # 매수 후보 건물 검색 설정
+  min_land_area_m2: 250          # 상가 3개 이상 가능 최소 대지면적 (~75평)
+  months_back: 12                # 최근 12개월 실거래 검색
+  lawd_codes:
+    - "41360"                    # 남양주시
+    - "41310"                    # 구리시
+    - "41450"                    # 하남시
+  building_use_keywords:
+    - "근린생활"                   # 상가+주거 건물 필터
