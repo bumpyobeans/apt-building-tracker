@@ -15,7 +15,7 @@ def analyze(transactions: list[dict], listings: list[dict], building: dict) -> d
 
     yield_info = _calc_yield(building, estimated_price_man)
     recommended = _pick_recommendations(listings, tx_stats['avg_price_per_pyeong'], building)
-    summary = _build_summary(tx_stats, estimated_price_man, my_name, my_pyeong, recommended, yield_info)
+    summary = _build_summary(tx_stats, estimated_price_man, my_name, my_pyeong, recommended, yield_info, building)
 
     return {
         'tx_stats': tx_stats,
@@ -30,14 +30,22 @@ def analyze(transactions: list[dict], listings: list[dict], building: dict) -> d
 def _transaction_stats(transactions: list[dict]) -> dict:
     if not transactions:
         return {'count': 0, 'avg_price_man': 0, 'min_price_man': 0,
-                'max_price_man': 0, 'avg_price_per_pyeong': 0}
+                'max_price_man': 0, 'avg_price_per_pyeong': 0,
+                'median_price_man': 0, 'recent_3_avg': 0}
     prices = [t['price_man'] for t in transactions]
     ppyeongs = [t['price_per_pyeong'] for t in transactions if t['price_per_pyeong'] > 0]
+    sorted_prices = sorted(prices)
+    n = len(sorted_prices)
+    median = sorted_prices[n // 2] if n % 2 else (sorted_prices[n//2 - 1] + sorted_prices[n//2]) // 2
+    # 최근 3건 평균 (날짜 기준 이미 정렬됨)
+    recent3 = round(sum(prices[:3]) / min(3, len(prices)))
     return {
         'count': len(transactions),
         'avg_price_man': round(sum(prices) / len(prices)),
         'min_price_man': min(prices),
         'max_price_man': max(prices),
+        'median_price_man': median,
+        'recent_3_avg': recent3,
         'avg_price_per_pyeong': round(sum(ppyeongs) / len(ppyeongs)) if ppyeongs else 0,
     }
 
@@ -109,11 +117,21 @@ def _pick_recommendations(listings: list[dict], market_avg_ppyeong: int, buildin
 
 
 def _build_summary(tx_stats: dict, estimated_price_man: int, my_name: str,
-                   my_pyeong: float, recommended: list[dict], yield_info: dict | None) -> str:
+                   my_pyeong: float, recommended: list[dict], yield_info: dict | None,
+                   building: dict | None = None) -> str:
     lines = []
     lines.append(f'📅 {datetime.now().strftime("%Y년 %m월 %d일")} 주간 부동산 시세 리포트')
     lines.append('')
-    lines.append(f'🏢 {my_name} (대지 {my_pyeong:.1f}평 | 상가+주거)')
+    b           = building or {}
+    floors      = b.get('total_floors', '-')
+    shop_u      = b.get('shop_units', '-')
+    shop_fl     = b.get('shop_floors', '1층')
+    resi_u      = b.get('residential_units', '-')
+    resi_fl     = b.get('residential_floors', '2층')
+    owner_fl    = b.get('owner_floor', '-')
+    lines.append(f'🏢 {my_name}')
+    lines.append(f'   대지: {my_pyeong:.1f}평  |  지상 {floors}층  |  상가+주거')
+    lines.append(f'   근린생활시설: {shop_u}개 ({shop_fl})  |  주거: {resi_u}세대 ({resi_fl})  |  주인거주: {owner_fl}층')
 
     if estimated_price_man > 0:
         lines.append(f'   추정 시세: {_fmt(estimated_price_man)}')
@@ -136,11 +154,12 @@ def _build_summary(tx_stats: dict, estimated_price_man: int, my_name: str,
         lines.append(f'   매도 후 실수령 (추정): {_fmt(yi["net_proceeds_man"])} (보증금 반환+대출상환 후)')
 
     lines.append('')
-    lines.append(f'📊 주변 실거래가 ({tx_stats["count"]}건)')
+    lines.append(f'📊 현재 시세 (최근 6개월 실거래 {tx_stats["count"]}건)')
     if tx_stats['count'] > 0:
-        lines.append(f'   평균: {_fmt(tx_stats["avg_price_man"])}')
-        lines.append(f'   범위: {_fmt(tx_stats["min_price_man"])} ~ {_fmt(tx_stats["max_price_man"])}')
-        lines.append(f'   평당: {tx_stats["avg_price_per_pyeong"]:,}만원')
+        lines.append(f'   평당 시세:   {tx_stats["avg_price_per_pyeong"]:,}만원/평')
+        lines.append(f'   최근 3건 평균: {_fmt(tx_stats["recent_3_avg"])}')
+        lines.append(f'   중간값:      {_fmt(tx_stats["median_price_man"])}')
+        lines.append(f'   거래 범위:   {_fmt(tx_stats["min_price_man"])} ~ {_fmt(tx_stats["max_price_man"])}')
 
     if recommended:
         lines.append('')

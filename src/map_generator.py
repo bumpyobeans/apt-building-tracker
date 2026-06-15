@@ -79,7 +79,7 @@ def generate(transactions: list[dict], building: dict, result: dict,
             'build_year': tx.get('build_year', ''),
         })
 
-    # ── 내 건물 데이터 (JS에서 정밀 지오코딩) ──────────────────────────────
+    # ── 내 건물 데이터 ──────────────────────────────────────────────────────
     fallback = DONG_COORDS.get('별내동', NAMYANGJU_CENTER)
     my_building = {
         'lat': fallback[0],
@@ -87,6 +87,15 @@ def generate(transactions: list[dict], building: dict, result: dict,
         'name': building.get('name', '내 건물'),
         'address': building.get('address', ''),
         'estimated_price': _fmt(result.get('estimated_price_man', 0)),
+        'total_floors': building.get('total_floors', '-'),
+        'shop_units': building.get('shop_units', '-'),
+        'shop_floors': building.get('shop_floors', '1층'),
+        'residential_units': building.get('residential_units', '-'),
+        'residential_floors': building.get('residential_floors', '2층'),
+        'owner_floor': building.get('owner_floor', '-'),
+        'land_pyeong': round(
+            (building.get('land_area_m2') or 0) / 3.3058, 1
+        ),
     }
 
     stats = result.get('tx_stats', {})
@@ -103,6 +112,20 @@ def generate(transactions: list[dict], building: dict, result: dict,
         'gap': yi.get('gap_yield_pct', '-'),
         'equity': yi.get('equity_yield_pct', '-'),
         'net_proceeds': _fmt(yi['net_proceeds_man']) if yi.get('net_proceeds_man') else '-',
+    }
+
+    # 현재 시세 블록
+    market = {
+        'avg_ppyeong': stats.get('avg_price_per_pyeong', 0),
+        'min': _fmt(stats.get('min_price_man', 0)),
+        'max': _fmt(stats.get('max_price_man', 0)),
+        'median': _fmt(stats.get('median_price_man', 0)),
+        'recent3': _fmt(stats.get('recent_3_avg', 0)),
+        'count': stats.get('count', 0),
+        'my_estimated': _fmt(result.get('estimated_price_man', 0)),
+        'my_pyeong': round(
+            (building.get('land_area_m2') or building.get('area_m2', 0)) / 3.3058, 1
+        ),
     }
 
     # ── 후보 건물 마커 ──────────────────────────────────────────────────────
@@ -130,7 +153,8 @@ def generate(transactions: list[dict], building: dict, result: dict,
 
     data_json = json.dumps(
         {'transactions': markers, 'my_building': my_building,
-         'candidates': cand_markers, 'summary': summary, 'yield_info': yield_info},
+         'candidates': cand_markers, 'summary': summary,
+         'yield_info': yield_info, 'market': market},
         ensure_ascii=False,
     )
 
@@ -164,10 +188,22 @@ body { font-family: -apple-system, 'Apple SD Gothic Neo', '맑은 고딕', sans-
 #map { flex: 1; min-width: 0; }
 .panel { padding: 16px; border-bottom: 1px solid #eee; }
 .panel h2 { font-size: 15px; color: #333; margin-bottom: 8px; }
-.summary-card { background: #f0f4ff; border-radius: 8px; padding: 12px; }
-.summary-card .price { font-size: 22px; font-weight: 700; color: #1a73e8; }
-.summary-card .meta { font-size: 12px; color: #666; margin-top: 4px; line-height: 1.5; }
-.yield-row { display: flex; gap: 6px; margin-top: 10px; flex-wrap: wrap; }
+.summary-card { background: #f8f9ff; border-radius: 8px; padding: 14px; }
+.summary-card .price { font-size: 20px; font-weight: 700; color: #1a73e8; margin: 4px 0 2px; }
+.section-label { font-size: 11px; font-weight: 700; color: #555; margin: 8px 0 6px; letter-spacing: .3px; }
+.market-row { display: flex; gap: 8px; margin-bottom: 6px; }
+.market-box { flex: 1; background: #fff; border: 1px solid #d0d8ff; border-radius: 7px; padding: 8px; text-align: center; }
+.market-label { font-size: 10px; color: #888; margin-bottom: 3px; }
+.market-val { font-size: 17px; font-weight: 700; color: #1a73e8; }
+.market-unit { font-size: 11px; font-weight: 400; }
+.range-row { display: flex; justify-content: space-between; font-size: 12px; margin: 3px 0; }
+.range-label { color: #999; }
+.range-val { font-weight: 600; color: #333; }
+.divider { border: none; border-top: 1px solid #e8eaf0; margin: 10px 0; }
+.bldg-info { display: flex; flex-wrap: wrap; gap: 5px; margin: 6px 0 2px; }
+.bldg-tag { background: #e8f0fe; color: #1a73e8; border-radius: 4px;
+            padding: 2px 7px; font-size: 11px; font-weight: 600; }
+.yield-row { display: flex; gap: 6px; margin-top: 4px; flex-wrap: wrap; }
 .yield-chip { flex: 1; min-width: 56px; background: #fff; border: 1px solid #dde;
               border-radius: 6px; padding: 6px 4px; text-align: center; }
 .yield-chip .label { font-size: 10px; color: #888; }
@@ -219,17 +255,54 @@ var mb = RAW.my_building;
 
 // ── 요약 카드 ──────────────────────────────────────────────────────────────
 (function() {
-  var s = RAW.summary, y = RAW.yield_info;
+  var s = RAW.summary, y = RAW.yield_info, m = RAW.market;
   document.getElementById('summary-card').innerHTML =
-    '<div class="price">' + s.estimated_price + '</div>' +
-    '<div class="meta">추정 매매가 &nbsp;|&nbsp; ' + s.report_date + '<br>' +
-      s.count + '건 평균 ' + s.avg_ppyeong.toLocaleString() + '만원/평</div>' +
+
+    // ① 현재 시세 (주변 실거래가)
+    '<div class="section-label">📊 현재 시세 <span style="font-size:10px;color:#999">(최근 6개월 실거래 ' + m.count + '건)</span></div>' +
+    '<div class="market-row">' +
+      '<div class="market-box">' +
+        '<div class="market-label">평당 시세</div>' +
+        '<div class="market-val">' + m.avg_ppyeong.toLocaleString() + '<span class="market-unit">만원</span></div>' +
+      '</div>' +
+      '<div class="market-box">' +
+        '<div class="market-label">최근 3건 평균</div>' +
+        '<div class="market-val" style="font-size:15px">' + m.recent3 + '</div>' +
+      '</div>' +
+    '</div>' +
+    '<div class="range-row">' +
+      '<span class="range-label">거래 범위</span>' +
+      '<span class="range-val">' + m.min + ' ~ ' + m.max + '</span>' +
+    '</div>' +
+    '<div class="range-row">' +
+      '<span class="range-label">중간값</span>' +
+      '<span class="range-val">' + m.median + '</span>' +
+    '</div>' +
+
+    '<div class="divider"></div>' +
+
+    // ② 내 건물 예상가 + 구조
+    '<div class="section-label">🏠 내 건물 예상가 <span style="font-size:10px;color:#999">(' + m.my_pyeong + '평 × 평당)</span></div>' +
+    '<div class="price">' + m.my_estimated + '</div>' +
+    '<div class="bldg-info">' +
+      '<span class="bldg-tag">지상 ' + mb.total_floors + '층</span>' +
+      '<span class="bldg-tag">근린 ' + mb.shop_units + '개(' + mb.shop_floors + ')</span>' +
+      '<span class="bldg-tag">주거 ' + mb.residential_units + '세대(' + mb.residential_floors + ')</span>' +
+      '<span class="bldg-tag">주인 ' + mb.owner_floor + '층</span>' +
+    '</div>' +
+
+    '<div class="divider"></div>' +
+
+    // ③ 수익률
+    '<div class="section-label">💰 수익률 분석</div>' +
     '<div class="yield-row">' +
       '<div class="yield-chip"><div class="label">총 수익률</div><div class="val">' + y.gross + '%</div></div>' +
       '<div class="yield-chip"><div class="label">갭 수익률</div><div class="val">' + y.gap + '%</div></div>' +
       '<div class="yield-chip"><div class="label">자기자본</div><div class="val">' + y.equity + '%</div></div>' +
       '<div class="yield-chip"><div class="label">실수령 예상</div><div class="val" style="font-size:11px">' + y.net_proceeds + '</div></div>' +
-    '</div>';
+    '</div>' +
+
+    '<div style="font-size:10px;color:#bbb;margin-top:6px;text-align:right">' + s.report_date + ' 기준</div>';
 })();
 
 // ── 지도 초기화 (Leaflet + OpenStreetMap) ────────────────────────────────
@@ -251,8 +324,15 @@ L.marker([mb.lat, mb.lng], { icon: myIcon, zIndexOffset: 1000 })
   .addTo(map)
   .bindPopup(
     '<b style="font-size:14px">' + mb.name + '</b><br>' +
-    '<span style="color:#888;font-size:12px">' + mb.address + '</span><br>' +
-    '<span style="color:#ff6b35;font-weight:700;font-size:16px">추정 시세: ' + mb.estimated_price + '</span>'
+    '<span style="color:#888;font-size:11px">' + mb.address + '</span><br><br>' +
+    '<table style="font-size:12px;border-collapse:collapse;width:100%">' +
+      '<tr><td style="color:#888;padding:2px 8px 2px 0">총 층수</td><td><b>' + mb.total_floors + '층</b></td></tr>' +
+      '<tr><td style="color:#888;padding:2px 8px 2px 0">근린생활시설</td><td><b>' + mb.shop_units + '개</b> (' + mb.shop_floors + ')</td></tr>' +
+      '<tr><td style="color:#888;padding:2px 8px 2px 0">주거 세대</td><td><b>' + mb.residential_units + '세대</b> (' + mb.residential_floors + ')</td></tr>' +
+      '<tr><td style="color:#888;padding:2px 8px 2px 0">주인 거주</td><td><b>' + mb.owner_floor + '층</b></td></tr>' +
+      '<tr><td style="color:#888;padding:2px 8px 2px 0">대지면적</td><td><b>' + mb.land_pyeong + '평</b></td></tr>' +
+    '</table><br>' +
+    '<span style="color:#ff6b35;font-weight:700;font-size:15px">예상 시세: ' + mb.estimated_price + '</span>'
   );
 
 // ── 거래 마커 + 목록 ──────────────────────────────────────────────────────

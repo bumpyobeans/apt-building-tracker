@@ -17,10 +17,22 @@ body { font-family: -apple-system, 'Apple SD Gothic Neo', '맑은 고딕', sans-
 #map { flex: 1; min-width: 0; }
 .panel { padding: 16px; border-bottom: 1px solid #eee; }
 .panel h2 { font-size: 15px; color: #333; margin-bottom: 8px; }
-.summary-card { background: #f0f4ff; border-radius: 8px; padding: 12px; }
-.summary-card .price { font-size: 22px; font-weight: 700; color: #1a73e8; }
-.summary-card .meta { font-size: 12px; color: #666; margin-top: 4px; line-height: 1.5; }
-.yield-row { display: flex; gap: 6px; margin-top: 10px; flex-wrap: wrap; }
+.summary-card { background: #f8f9ff; border-radius: 8px; padding: 14px; }
+.summary-card .price { font-size: 20px; font-weight: 700; color: #1a73e8; margin: 4px 0 2px; }
+.section-label { font-size: 11px; font-weight: 700; color: #555; margin: 8px 0 6px; letter-spacing: .3px; }
+.market-row { display: flex; gap: 8px; margin-bottom: 6px; }
+.market-box { flex: 1; background: #fff; border: 1px solid #d0d8ff; border-radius: 7px; padding: 8px; text-align: center; }
+.market-label { font-size: 10px; color: #888; margin-bottom: 3px; }
+.market-val { font-size: 17px; font-weight: 700; color: #1a73e8; }
+.market-unit { font-size: 11px; font-weight: 400; }
+.range-row { display: flex; justify-content: space-between; font-size: 12px; margin: 3px 0; }
+.range-label { color: #999; }
+.range-val { font-weight: 600; color: #333; }
+.divider { border: none; border-top: 1px solid #e8eaf0; margin: 10px 0; }
+.bldg-info { display: flex; flex-wrap: wrap; gap: 5px; margin: 6px 0 2px; }
+.bldg-tag { background: #e8f0fe; color: #1a73e8; border-radius: 4px;
+            padding: 2px 7px; font-size: 11px; font-weight: 600; }
+.yield-row { display: flex; gap: 6px; margin-top: 4px; flex-wrap: wrap; }
 .yield-chip { flex: 1; min-width: 56px; background: #fff; border: 1px solid #dde;
               border-radius: 6px; padding: 6px 4px; text-align: center; }
 .yield-chip .label { font-size: 10px; color: #888; }
@@ -67,22 +79,59 @@ body { font-family: -apple-system, 'Apple SD Gothic Neo', '맑은 고딕', sans-
 </div>
 
 <script>
-var RAW = {"transactions": [{"lat": 37.6355, "lng": 127.198, "date": "2026-06-05", "price_man": 48115, "price_label": "4억 8,115만원", "pyeong": 100.2, "price_per_pyeong": 0, "building_name": "판매", "address": "다산동 6192-1", "floor": "-", "build_year": "2023"}, {"lat": 37.6761, "lng": 127.2202, "date": "2026-05-25", "price_man": 50000, "price_label": "5억", "pyeong": 70.1, "price_per_pyeong": 0, "building_name": "기타", "address": "오남읍 오남리 475-8", "floor": "2", "build_year": "2006"}, {"lat": 37.7014, "lng": 127.1988, "date": "2026-05-20", "price_man": 114000, "price_label": "11억 4,000만원", "pyeong": 99.8, "price_per_pyeong": 1142, "building_name": "제1종근린생활", "address": "진접읍 내곡리 1**", "floor": "-", "build_year": "2003"}, {"lat": 37.6383, "lng": 127.3011, "date": "2026-05-15", "price_man": 68000, "price_label": "6억 8,000만원", "pyeong": 119.2, "price_per_pyeong": 571, "building_name": "제2종근린생활", "address": "화도읍 차산리 5**", "floor": "-", "build_year": "None"}, {"lat": 37.6005, "lng": 127.1674, "date": "2026-04-11", "price_man": 43000, "price_label": "4억 3,000만원", "pyeong": 104.4, "price_per_pyeong": 0, "building_name": "제2종근린생활", "address": "와부읍 덕소리 612", "floor": "-", "build_year": "2007"}, {"lat": 37.6517, "lng": 127.1869, "date": "2026-04-06", "price_man": 95000, "price_label": "9억 5,000만원", "pyeong": 102.5, "price_per_pyeong": 926, "building_name": "제1종근린생활", "address": "호평동 2*", "floor": "-", "build_year": "2007"}, {"lat": 37.600205, "lng": 127.16767, "date": "2026-04-04", "price_man": 105600, "price_label": "10억 5,600만원", "pyeong": 99.8, "price_per_pyeong": 1058, "building_name": "제2종근린생활", "address": "와부읍 율석리 7**", "floor": "-", "build_year": "2023"}, {"lat": 37.701105, "lng": 127.19907, "date": "2026-04-01", "price_man": 298000, "price_label": "29억 8,000만원", "pyeong": 129.6, "price_per_pyeong": 2299, "building_name": "기타", "address": "진접읍 장현리 7*", "floor": "-", "build_year": "2016"}, {"lat": 37.675805, "lng": 127.22047, "date": "2026-03-27", "price_man": 137809, "price_label": "13억 7,809만원", "pyeong": 80.3, "price_per_pyeong": 0, "building_name": "제1종근린생활", "address": "오남읍 양지리 106-3", "floor": "1", "build_year": "2007"}, {"lat": 37.676149, "lng": 127.219636, "date": "2026-03-27", "price_man": 55970, "price_label": "5억 5,970만원", "pyeong": 94.4, "price_per_pyeong": 0, "building_name": "기타", "address": "오남읍 양지리 106-3", "floor": "4", "build_year": "2007"}, {"lat": 37.676522, "lng": 127.22075, "date": "2026-03-27", "price_man": 44884, "price_label": "4억 4,884만원", "pyeong": 70.8, "price_per_pyeong": 0, "building_name": "기타", "address": "오남읍 양지리 106-3", "floor": "4", "build_year": "2007"}, {"lat": 37.675312, "lng": 127.220061, "date": "2026-03-27", "price_man": 45269, "price_label": "4억 5,269만원", "pyeong": 73.7, "price_per_pyeong": 0, "building_name": "기타", "address": "오남읍 양지리 106-3", "floor": "5", "build_year": "2007"}, {"lat": 37.600549, "lng": 127.166836, "date": "2026-03-21", "price_man": 150000, "price_label": "15억", "pyeong": 108.6, "price_per_pyeong": 1381, "building_name": "제2종근린생활", "address": "와부읍 덕소리 5**", "floor": "-", "build_year": "None"}, {"lat": 37.6252, "lng": 127.1386, "date": "2026-03-20", "price_man": 134000, "price_label": "13억 4,000만원", "pyeong": 107.3, "price_per_pyeong": 0, "building_name": "제2종근린생활", "address": "별내동 826-10", "floor": "2", "build_year": "2013"}, {"lat": 37.7394, "lng": 127.2919, "date": "2026-03-12", "price_man": 51261, "price_label": "5억 1,261만원", "pyeong": 129.2, "price_per_pyeong": 397, "building_name": "제1종근린생활", "address": "수동면 입석리 2**", "floor": "-", "build_year": "2023"}, {"lat": 37.600922, "lng": 127.16795, "date": "2026-02-23", "price_man": 55928, "price_label": "5억 5,928만원", "pyeong": 87.9, "price_per_pyeong": 0, "building_name": "기타", "address": "와부읍 덕소리 487-1", "floor": "4", "build_year": "2005"}, {"lat": 37.6517, "lng": 127.19, "date": "2026-02-05", "price_man": 126000, "price_label": "12억 6,000만원", "pyeong": 73.4, "price_per_pyeong": 1717, "building_name": "제2종근린생활", "address": "평내동 5**", "floor": "-", "build_year": "2005"}, {"lat": 37.701449, "lng": 127.198236, "date": "2026-02-03", "price_man": 298000, "price_label": "29억 8,000만원", "pyeong": 129.6, "price_per_pyeong": 2299, "building_name": "기타", "address": "진접읍 장현리 7*", "floor": "-", "build_year": "2016"}, {"lat": 37.599712, "lng": 127.167261, "date": "2026-01-30", "price_man": 68268, "price_label": "6억 8,268만원", "pyeong": 80.2, "price_per_pyeong": 852, "building_name": "제2종근린생활", "address": "와부읍 율석리 4**", "floor": "-", "build_year": "2023"}, {"lat": 37.6161, "lng": 127.1669, "date": "2026-01-16", "price_man": 160000, "price_label": "16억", "pyeong": 128.9, "price_per_pyeong": 0, "building_name": "기타", "address": "금곡동 153-1", "floor": "6", "build_year": "2003"}, {"lat": 37.624905, "lng": 127.13887, "date": "2026-01-11", "price_man": 114350, "price_label": "11억 4,350만원", "pyeong": 107.3, "price_per_pyeong": 0, "building_name": "제2종근린생활", "address": "별내동 826-10", "floor": "7", "build_year": "2013"}, {"lat": 37.701822, "lng": 127.19935, "date": "2026-01-03", "price_man": 115000, "price_label": "11억 5,000만원", "pyeong": 111.2, "price_per_pyeong": 0, "building_name": "기타", "address": "진접읍 금곡리 1021", "floor": "8", "build_year": "2010"}], "my_building": {"lat": 37.6252, "lng": 127.1386, "name": "별내동 건물", "address": "경기도 남양주시 불암로 41-82", "estimated_price": "12억 6,400만원"}, "candidates": [], "summary": {"count": 22, "estimated_price": "12억 6,400만원", "avg_ppyeong": 1264, "report_date": "2026-06-15"}, "yield_info": {"gross": 4.18, "gap": 6.91, "equity": 8.6, "net_proceeds": "6억 1,400만원"}};
+var RAW = {"transactions": [{"lat": 37.6355, "lng": 127.198, "date": "2026-06-05", "price_man": 48115, "price_label": "4억 8,115만원", "pyeong": 100.2, "price_per_pyeong": 0, "building_name": "판매", "address": "다산동 6192-1", "floor": "-", "build_year": "2023"}, {"lat": 37.6761, "lng": 127.2202, "date": "2026-05-25", "price_man": 50000, "price_label": "5억", "pyeong": 70.1, "price_per_pyeong": 0, "building_name": "기타", "address": "오남읍 오남리 475-8", "floor": "2", "build_year": "2006"}, {"lat": 37.7014, "lng": 127.1988, "date": "2026-05-20", "price_man": 114000, "price_label": "11억 4,000만원", "pyeong": 99.8, "price_per_pyeong": 1142, "building_name": "제1종근린생활", "address": "진접읍 내곡리 1**", "floor": "-", "build_year": "2003"}, {"lat": 37.6383, "lng": 127.3011, "date": "2026-05-15", "price_man": 68000, "price_label": "6억 8,000만원", "pyeong": 119.2, "price_per_pyeong": 571, "building_name": "제2종근린생활", "address": "화도읍 차산리 5**", "floor": "-", "build_year": "None"}, {"lat": 37.6005, "lng": 127.1674, "date": "2026-04-11", "price_man": 43000, "price_label": "4억 3,000만원", "pyeong": 104.4, "price_per_pyeong": 0, "building_name": "제2종근린생활", "address": "와부읍 덕소리 612", "floor": "-", "build_year": "2007"}, {"lat": 37.6517, "lng": 127.1869, "date": "2026-04-06", "price_man": 95000, "price_label": "9억 5,000만원", "pyeong": 102.5, "price_per_pyeong": 926, "building_name": "제1종근린생활", "address": "호평동 2*", "floor": "-", "build_year": "2007"}, {"lat": 37.600205, "lng": 127.16767, "date": "2026-04-04", "price_man": 105600, "price_label": "10억 5,600만원", "pyeong": 99.8, "price_per_pyeong": 1058, "building_name": "제2종근린생활", "address": "와부읍 율석리 7**", "floor": "-", "build_year": "2023"}, {"lat": 37.701105, "lng": 127.19907, "date": "2026-04-01", "price_man": 298000, "price_label": "29억 8,000만원", "pyeong": 129.6, "price_per_pyeong": 2299, "building_name": "기타", "address": "진접읍 장현리 7*", "floor": "-", "build_year": "2016"}, {"lat": 37.675805, "lng": 127.22047, "date": "2026-03-27", "price_man": 137809, "price_label": "13억 7,809만원", "pyeong": 80.3, "price_per_pyeong": 0, "building_name": "제1종근린생활", "address": "오남읍 양지리 106-3", "floor": "1", "build_year": "2007"}, {"lat": 37.676149, "lng": 127.219636, "date": "2026-03-27", "price_man": 55970, "price_label": "5억 5,970만원", "pyeong": 94.4, "price_per_pyeong": 0, "building_name": "기타", "address": "오남읍 양지리 106-3", "floor": "4", "build_year": "2007"}, {"lat": 37.676522, "lng": 127.22075, "date": "2026-03-27", "price_man": 44884, "price_label": "4억 4,884만원", "pyeong": 70.8, "price_per_pyeong": 0, "building_name": "기타", "address": "오남읍 양지리 106-3", "floor": "4", "build_year": "2007"}, {"lat": 37.675312, "lng": 127.220061, "date": "2026-03-27", "price_man": 45269, "price_label": "4억 5,269만원", "pyeong": 73.7, "price_per_pyeong": 0, "building_name": "기타", "address": "오남읍 양지리 106-3", "floor": "5", "build_year": "2007"}, {"lat": 37.600549, "lng": 127.166836, "date": "2026-03-21", "price_man": 150000, "price_label": "15억", "pyeong": 108.6, "price_per_pyeong": 1381, "building_name": "제2종근린생활", "address": "와부읍 덕소리 5**", "floor": "-", "build_year": "None"}, {"lat": 37.6252, "lng": 127.1386, "date": "2026-03-20", "price_man": 134000, "price_label": "13억 4,000만원", "pyeong": 107.3, "price_per_pyeong": 0, "building_name": "제2종근린생활", "address": "별내동 826-10", "floor": "2", "build_year": "2013"}, {"lat": 37.7394, "lng": 127.2919, "date": "2026-03-12", "price_man": 51261, "price_label": "5억 1,261만원", "pyeong": 129.2, "price_per_pyeong": 397, "building_name": "제1종근린생활", "address": "수동면 입석리 2**", "floor": "-", "build_year": "2023"}, {"lat": 37.600922, "lng": 127.16795, "date": "2026-02-23", "price_man": 55928, "price_label": "5억 5,928만원", "pyeong": 87.9, "price_per_pyeong": 0, "building_name": "기타", "address": "와부읍 덕소리 487-1", "floor": "4", "build_year": "2005"}, {"lat": 37.6517, "lng": 127.19, "date": "2026-02-05", "price_man": 126000, "price_label": "12억 6,000만원", "pyeong": 73.4, "price_per_pyeong": 1717, "building_name": "제2종근린생활", "address": "평내동 5**", "floor": "-", "build_year": "2005"}, {"lat": 37.701449, "lng": 127.198236, "date": "2026-02-03", "price_man": 298000, "price_label": "29억 8,000만원", "pyeong": 129.6, "price_per_pyeong": 2299, "building_name": "기타", "address": "진접읍 장현리 7*", "floor": "-", "build_year": "2016"}, {"lat": 37.599712, "lng": 127.167261, "date": "2026-01-30", "price_man": 68268, "price_label": "6억 8,268만원", "pyeong": 80.2, "price_per_pyeong": 852, "building_name": "제2종근린생활", "address": "와부읍 율석리 4**", "floor": "-", "build_year": "2023"}, {"lat": 37.6161, "lng": 127.1669, "date": "2026-01-16", "price_man": 160000, "price_label": "16억", "pyeong": 128.9, "price_per_pyeong": 0, "building_name": "기타", "address": "금곡동 153-1", "floor": "6", "build_year": "2003"}, {"lat": 37.624905, "lng": 127.13887, "date": "2026-01-11", "price_man": 114350, "price_label": "11억 4,350만원", "pyeong": 107.3, "price_per_pyeong": 0, "building_name": "제2종근린생활", "address": "별내동 826-10", "floor": "7", "build_year": "2013"}, {"lat": 37.701822, "lng": 127.19935, "date": "2026-01-03", "price_man": 115000, "price_label": "11억 5,000만원", "pyeong": 111.2, "price_per_pyeong": 0, "building_name": "기타", "address": "진접읍 금곡리 1021", "floor": "8", "build_year": "2010"}], "my_building": {"lat": 37.6252, "lng": 127.1386, "name": "별내동 건물", "address": "경기도 남양주시 불암로 41-82", "estimated_price": "12억 6,400만원", "total_floors": 3, "shop_units": 2, "shop_floors": "1층", "residential_units": 2, "residential_floors": "2층", "owner_floor": 3, "land_pyeong": 100.0}, "candidates": [], "summary": {"count": 22, "estimated_price": "12억 6,400만원", "avg_ppyeong": 1264, "report_date": "2026-06-15"}, "yield_info": {"gross": 4.18, "gap": 6.91, "equity": 8.6, "net_proceeds": "6억 1,400만원"}, "market": {"avg_ppyeong": 1264, "min": "4억 3,000만원", "max": "29억 8,000만원", "median": "10억 300만원", "recent3": "7억 705만원", "count": 22, "my_estimated": "12억 6,400만원", "my_pyeong": 100.0}};
 var mb = RAW.my_building;
 
 // ── 요약 카드 ──────────────────────────────────────────────────────────────
 (function() {
-  var s = RAW.summary, y = RAW.yield_info;
+  var s = RAW.summary, y = RAW.yield_info, m = RAW.market;
   document.getElementById('summary-card').innerHTML =
-    '<div class="price">' + s.estimated_price + '</div>' +
-    '<div class="meta">추정 매매가 &nbsp;|&nbsp; ' + s.report_date + '<br>' +
-      s.count + '건 평균 ' + s.avg_ppyeong.toLocaleString() + '만원/평</div>' +
+
+    // ① 현재 시세 (주변 실거래가)
+    '<div class="section-label">📊 현재 시세 <span style="font-size:10px;color:#999">(최근 6개월 실거래 ' + m.count + '건)</span></div>' +
+    '<div class="market-row">' +
+      '<div class="market-box">' +
+        '<div class="market-label">평당 시세</div>' +
+        '<div class="market-val">' + m.avg_ppyeong.toLocaleString() + '<span class="market-unit">만원</span></div>' +
+      '</div>' +
+      '<div class="market-box">' +
+        '<div class="market-label">최근 3건 평균</div>' +
+        '<div class="market-val" style="font-size:15px">' + m.recent3 + '</div>' +
+      '</div>' +
+    '</div>' +
+    '<div class="range-row">' +
+      '<span class="range-label">거래 범위</span>' +
+      '<span class="range-val">' + m.min + ' ~ ' + m.max + '</span>' +
+    '</div>' +
+    '<div class="range-row">' +
+      '<span class="range-label">중간값</span>' +
+      '<span class="range-val">' + m.median + '</span>' +
+    '</div>' +
+
+    '<div class="divider"></div>' +
+
+    // ② 내 건물 예상가 + 구조
+    '<div class="section-label">🏠 내 건물 예상가 <span style="font-size:10px;color:#999">(' + m.my_pyeong + '평 × 평당)</span></div>' +
+    '<div class="price">' + m.my_estimated + '</div>' +
+    '<div class="bldg-info">' +
+      '<span class="bldg-tag">지상 ' + mb.total_floors + '층</span>' +
+      '<span class="bldg-tag">근린 ' + mb.shop_units + '개(' + mb.shop_floors + ')</span>' +
+      '<span class="bldg-tag">주거 ' + mb.residential_units + '세대(' + mb.residential_floors + ')</span>' +
+      '<span class="bldg-tag">주인 ' + mb.owner_floor + '층</span>' +
+    '</div>' +
+
+    '<div class="divider"></div>' +
+
+    // ③ 수익률
+    '<div class="section-label">💰 수익률 분석</div>' +
     '<div class="yield-row">' +
       '<div class="yield-chip"><div class="label">총 수익률</div><div class="val">' + y.gross + '%</div></div>' +
       '<div class="yield-chip"><div class="label">갭 수익률</div><div class="val">' + y.gap + '%</div></div>' +
       '<div class="yield-chip"><div class="label">자기자본</div><div class="val">' + y.equity + '%</div></div>' +
       '<div class="yield-chip"><div class="label">실수령 예상</div><div class="val" style="font-size:11px">' + y.net_proceeds + '</div></div>' +
-    '</div>';
+    '</div>' +
+
+    '<div style="font-size:10px;color:#bbb;margin-top:6px;text-align:right">' + s.report_date + ' 기준</div>';
 })();
 
 // ── 지도 초기화 (Leaflet + OpenStreetMap) ────────────────────────────────
@@ -104,8 +153,15 @@ L.marker([mb.lat, mb.lng], { icon: myIcon, zIndexOffset: 1000 })
   .addTo(map)
   .bindPopup(
     '<b style="font-size:14px">' + mb.name + '</b><br>' +
-    '<span style="color:#888;font-size:12px">' + mb.address + '</span><br>' +
-    '<span style="color:#ff6b35;font-weight:700;font-size:16px">추정 시세: ' + mb.estimated_price + '</span>'
+    '<span style="color:#888;font-size:11px">' + mb.address + '</span><br><br>' +
+    '<table style="font-size:12px;border-collapse:collapse;width:100%">' +
+      '<tr><td style="color:#888;padding:2px 8px 2px 0">총 층수</td><td><b>' + mb.total_floors + '층</b></td></tr>' +
+      '<tr><td style="color:#888;padding:2px 8px 2px 0">근린생활시설</td><td><b>' + mb.shop_units + '개</b> (' + mb.shop_floors + ')</td></tr>' +
+      '<tr><td style="color:#888;padding:2px 8px 2px 0">주거 세대</td><td><b>' + mb.residential_units + '세대</b> (' + mb.residential_floors + ')</td></tr>' +
+      '<tr><td style="color:#888;padding:2px 8px 2px 0">주인 거주</td><td><b>' + mb.owner_floor + '층</b></td></tr>' +
+      '<tr><td style="color:#888;padding:2px 8px 2px 0">대지면적</td><td><b>' + mb.land_pyeong + '평</b></td></tr>' +
+    '</table><br>' +
+    '<span style="color:#ff6b35;font-weight:700;font-size:15px">예상 시세: ' + mb.estimated_price + '</span>'
   );
 
 // ── 거래 마커 + 목록 ──────────────────────────────────────────────────────

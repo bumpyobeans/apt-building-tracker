@@ -5,12 +5,19 @@ building:
   building_type: "mixed"       # apartment / villa / officetel / detached / mixed(상가+주거)
   land_area_m2: 330.58         # 대지면적 (100평 × 3.3058)
 
+  # 건물 구조
+  total_floors: 3              # 지상 총 층수
+  shop_units: 2                # 근린생활시설(상가) 개수
+  shop_floors: "1층"           # 상가 위치 층
+  residential_units: 2         # 주거 세대수
+  residential_floors: "2층"    # 주거 위치 층
+  owner_floor: 3               # 주인 거주 층
+
   # 임대 현황
   monthly_rent_man: 440        # 월세 합계 (만원) — 1층 상가 2개 × 220만원
   shop_deposit_man: 5000       # 상가 보증금 합계 (만원)
   jeonse_deposit_man: 45000    # 전세 보증금 합계 (만원) — 2층 2억5천 + 2억
   loan_man: 15000              # 현재 대출 잔액 (만원)
-  owner_floor: 3               # 주인 거주 층 (매도 시 이사 필요)
   # 세부 내역 (참고용)
   # 1층 상가A: 월세 220만원 / 보증금 포함
   # 1층 상가B: 월세 220만원 / 보증금 포함
